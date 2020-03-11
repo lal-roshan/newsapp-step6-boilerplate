@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace NewsService.Models
+{
+    public class Reminder
+    {
+      /*
+       * This class should have a property called Schedule which returns DateTime data type
+       */
+    }
+}
