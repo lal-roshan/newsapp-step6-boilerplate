@@ -29,6 +29,13 @@ namespace AuthenticationService
             //register all dependencies here
             //Implement token validation logic
             services.AddControllers();
+            services.AddDbContext<AuthDbContext>(
+                options => options.UseSqlServer(Configuration.GetConnectionString("AuthDb"))
+            );
+
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

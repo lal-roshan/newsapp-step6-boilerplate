@@ -3,13 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using NewsService.Models;
 using NewsService.Repository;
 using NewsService.Services;
-using System;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 namespace NewsService
 {
     public class Startup
@@ -18,14 +14,18 @@ namespace NewsService
         {
             Configuration = configuration;
         }
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(s => new NewsContext(Configuration));
+            services.AddScoped<INewsRepository, NewsRepository>();
+            services.AddScoped<INewsService, Services.NewsService>();
             services.AddControllers();
-            //register all dependencies here
-            //Implement token validation logic
+            //provide options for Database Context to Register Dependencies
+            //Register all dependencies here
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,17 +35,13 @@ namespace NewsService
             {
                 app.UseDeveloperExceptionPage();
             }
+
             app.UseRouting();
-             //Add extension method i.e Authentication and Authorization 
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private void ValidateToken(IConfiguration configuration, IServiceCollection services)
-        {
-            //Implement validate token logic
         }
     }
 }

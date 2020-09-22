@@ -1,4 +1,5 @@
 ﻿using AuthenticationService.Models;
+using System.Threading.Tasks;
 
 namespace AuthenticationService.Repository
 {

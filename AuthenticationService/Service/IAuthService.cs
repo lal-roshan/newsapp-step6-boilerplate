@@ -1,4 +1,6 @@
 ﻿using AuthenticationService.Models;
+using System.Threading.Tasks;
+
 namespace AuthenticationService.Service
 {
     /*
@@ -7,7 +9,7 @@ namespace AuthenticationService.Service
     */
     public interface IAuthService
     {
-        bool LoginUser(User user);
-        bool RegisterUser(User user);
+        Task<bool> LoginUser(User user);
+        Task<bool> RegisterUser(User user);
     }
 }

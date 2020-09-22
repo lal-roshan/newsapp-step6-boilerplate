@@ -1,15 +1,12 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using ReminderService.Models;
 using ReminderService.Repository;
 using ReminderService.Services;
-using System;
-using System.Text;
+
 namespace ReminderService
 {
     public class Startup
@@ -24,10 +21,12 @@ namespace ReminderService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            this.ValidateToken(Configuration, services);
+            services.AddSingleton(s => new ReminderContext(Configuration));
+            services.AddScoped<IReminderService, Services.ReminderService>();
+            services.AddScoped<IReminderRepository, ReminderRepository>();
             services.AddControllers();
-            //register all dependencies here
-            //Implement token validation logic
+            //provide options for Database Context to Register Dependencies
+            //Register all dependencies here
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,16 +38,11 @@ namespace ReminderService
             }
 
             app.UseRouting();
-            app.UseAuthentication().UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private void ValidateToken(IConfiguration configuration, IServiceCollection services)
-        {
-            //write a logic for validing the token
         }
     }
 }

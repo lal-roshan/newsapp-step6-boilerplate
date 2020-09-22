@@ -3,16 +3,36 @@ using MongoDB.Driver;
 
 namespace NewsService.Models
 {
+    /// <summary>
+    /// Class fascilitating communication with database
+    /// </summary>
     public class NewsContext
     {
-        //declare variables to connect to MongoDB database
+        /// <summary>
+        /// Represents the mongo client
+        /// </summary>
+        readonly MongoClient mongoClient;
+
+        /// <summary>
+        /// Represents the database that we operate upon
+        /// </summary>
+        readonly IMongoDatabase mongoDb;
+
+        /// <summary>
+        /// Constructor receiving the configuration file details and initialising mongo entities
+        /// </summary>
+        /// <param name="configuration"></param>
         public NewsContext(IConfiguration configuration)
         {
-            //Initialize MongoClient and Database using connection string and database name from configuration
+            ///Initialize client with connection string
+            mongoClient = new MongoClient(configuration.GetSection("MongoDB").GetSection("ConnectionString").Value);
+            ///Initialize database using database name
+            mongoDb = mongoClient.GetDatabase(configuration.GetSection("MongoDB").GetSection("NewsDatabase").Value);
         }
 
-        //Define a MongoCollection to represent the News collection of MongoDB based on UserNews type
-
-
+        /// <summary>
+        /// Represents the News Collection in database
+        /// </summary>
+        public IMongoCollection<UserNews> News => mongoDb.GetCollection<UserNews>("userNews");
     }
 }

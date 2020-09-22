@@ -1,12 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Text;
 using UserService.Models;
 using UserService.Repository;
 using UserService.Services;
@@ -18,16 +14,21 @@ namespace UserService
         {
             Configuration = configuration;
         }
+
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //register all dependencies here
-            //Implement token validation logic
+            ///provide options for Database Context to Register Dependencies
+            services.AddSingleton(s => new UserContext(Configuration));
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, Services.UserService>();
             services.AddControllers();
+            ///Register all dependencies here
         }
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -36,7 +37,7 @@ namespace UserService
             }
 
             app.UseRouting();
-            app.UseAuthentication().UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

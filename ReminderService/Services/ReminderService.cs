@@ -2,33 +2,102 @@
 using ReminderService.Models;
 using ReminderService.Repository;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 namespace ReminderService.Services
 {
-    public class ReminderService
+    /// <summary>
+    /// The service class for reminder entity
+    /// </summary>
+    public class ReminderService : IReminderService
     {
-        /*Inherit the respective interface and implement the methods in 
-         the class i.e ReminderService by inheriting IReminderService
-         */
+        /// <summary>
+        /// readonly property for repository
+        /// </summary>
+        readonly IReminderRepository reminderRepository;
 
-        /* ReminderRepository should  be injected through constructor injection. 
-         * Please note that we should not create ReminderRepository object using the new keyword
-         */
-       
+        /// <summary>
+        /// Parametrised constructor for injecting repository
+        /// </summary>
+        /// <param name="reminderRepository"></param>
         public ReminderService(IReminderRepository reminderRepository)
         {
-            
+            this.reminderRepository = reminderRepository;
         }
-        /* Implement all the methods of respective interface asynchronously*/
 
-        /* Implement GetReminders method which should be used to get all reminders by userId.*/
+        /// <summary>
+        /// Method for creating reminder
+        /// </summary>
+        /// <param name="userId">The user id against whom the reminder is to be added</param>
+        /// <param name="email">The email of the user</param>
+        /// <param name="schedule">The reminder details</param>
+        /// <returns>True if creation successful</returns>
+        public async Task<bool> CreateReminder(string userId, string email, ReminderSchedule schedule)
+        {
+            if (!await reminderRepository.IsReminderExists(userId, schedule.NewsId))
+            {
+                await reminderRepository.CreateReminder(userId, email, schedule);
+                return true;
+            }
+            else
+            {
+                throw new ReminderAlreadyExistsException($"This News already have a reminder");
+            }
+        }
 
-        /* Implement CreateReminder method which should be used to create a new reminder using userId, email
-           and reminder Object*/
+        /// <summary>
+        /// Method for deleting a reminder
+        /// </summary>
+        /// <param name="userId">The user whose reminder is to be deleted</param>
+        /// <param name="newsId">The news id to which the reminder is to be added</param>
+        /// <returns>Returns true if deletion was successful</returns>
+        public async Task<bool> DeleteReminder(string userId, int newsId)
+        {
+            if (await reminderRepository.DeleteReminder(userId, newsId))
+            {
+                return true;
+            }
+            else
+            {
+                throw new NoReminderFoundException("No reminder found for this news");
+            }
+        }
 
-        /* Implement DeleteReminder method which should be used to delete a reminder by userId and newsId*/
+        /// <summary>
+        /// Method for getting all reminders of a user
+        /// </summary>
+        /// <param name="userId">The id of the user whose reminders are to be fetched</param>
+        /// <returns>The list of reminders added by the user</returns>
+        public async Task<List<ReminderSchedule>> GetReminders(string userId)
+        {
+            var reminders = await reminderRepository.GetReminders(userId);
+            if (reminders != null && reminders.Any())
+            {
+                return reminders;
+            }
+            else
+            {
+                throw new NoReminderFoundException("No reminders found for this user");
+            }
+        }
 
-        /* Implement a UpdateReminder method which should be used to update an existing reminder by using
-         userId and reminder details*/
+        /// <summary>
+        /// Method for updating a reminder
+        /// </summary>
+        /// <param name="userId">The id of the user whose reminder is to be updated</param>
+        /// <param name="reminder">The new details of the reminder to be applied</param>
+        /// <returns>True if updation was successful</returns>
+        public async Task<bool> UpdateReminder(string userId, ReminderSchedule reminder)
+        {
+            var updated = await reminderRepository.UpdateReminder(userId, reminder);
+            if (updated)
+            {
+                return updated;
+            }
+            else
+            {
+                throw new NoReminderFoundException("No reminder found for this news");
+            }
+        }
     }
 }
