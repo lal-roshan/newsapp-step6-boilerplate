@@ -2,14 +2,24 @@
 
 namespace AuthenticationService.Models
 {
-    public class AuthDbContext:DbContext
+    /// <summary>
+    /// Class fascilitating communication with database
+    /// </summary>
+    public class AuthDbContext : DbContext
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="options"></param>
         public AuthDbContext(DbContextOptions options) : base(options)
         {
-            //make sure that database is auto generated using EF Core Code first
             Database.EnsureCreated();
         }
 
+        /// <summary>
+        /// Method invoked on model creation
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasKey(u => u.UserId);
@@ -17,7 +27,9 @@ namespace AuthenticationService.Models
             modelBuilder.Entity<User>().Property(u => u.Password).IsRequired();
         }
 
-        //Define a Dbset for User in the database
+        /// <summary>
+        /// Representing the users table in database
+        /// </summary>
         public DbSet<User> Users { get; set; }
     }
 }

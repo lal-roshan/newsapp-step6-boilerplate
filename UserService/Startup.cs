@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
 using UserService.Models;
 using UserService.Repository;
 using UserService.Services;
@@ -25,6 +29,32 @@ namespace UserService
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, Services.UserService>();
             services.AddControllers();
+
+            ///reading token payload related data from appsettings
+            var tokenData = Configuration.GetSection("TokenData");
+
+            ///add options for authentication
+            services.AddAuthentication(
+                options =>
+                {
+                    ///Provide default and challenge schema
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }
+                ).AddJwtBearer(
+                    ///Mention parameters that are to be validated
+                    o => o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = tokenData["Issuer"],
+                        ValidateAudience = true,
+                        ValidAudience = tokenData["Audience"],
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(tokenData["SecretKey"])),
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    }
+                );
             ///Register all dependencies here
         }
 
@@ -37,6 +67,10 @@ namespace UserService
             }
 
             app.UseRouting();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

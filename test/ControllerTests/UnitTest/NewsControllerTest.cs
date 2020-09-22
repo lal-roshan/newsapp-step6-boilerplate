@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using Xunit;
-using Moq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NewsService.Services;
-using NewsService.Models;
+using Moq;
 using NewsService.Controllers;
 using NewsService.Exceptions;
+using NewsService.Models;
+using NewsService.Services;
+using System;
+using System.Collections.Generic;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Test.ControllerTests.UnitTest
 {
@@ -131,7 +131,7 @@ namespace Test.ControllerTests.UnitTest
             var actionResult = Assert.IsType<NotFoundObjectResult>(actual);
             Assert.Equal($"NewsId {newsId} for {userId} doesn't exist", actionResult.Value);
         }
-        
+
         List<News> newsList = new List<News> {
         new News { NewsId = 101, Title = "IT industry in 2020", Content = "It is expected to have positive growth in 2020.", PublishedAt = DateTime.Now, UrlToImage = null,Url=null },
         new News { NewsId = 102, Title = "2020 FIFA U-17 Women World Cup", Content = "The tournament will be held in India between 2 and 21 November 2020", PublishedAt = DateTime.Now, UrlToImage = null, Url=null }

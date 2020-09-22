@@ -1,10 +1,10 @@
-﻿using System.Net;
+﻿using AuthenticationService;
+using AuthenticationService.Models;
+using Newtonsoft.Json;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Threading.Tasks;
-using AuthenticationService;
-using AuthenticationService.Models;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace Test.ControllerTests.IntegrationTest
@@ -24,7 +24,7 @@ namespace Test.ControllerTests.IntegrationTest
         [Fact, TestPriority(1)]
         public async Task RegisterUserShouldSuccess()
         {
-            User user = new User {UserId="John", Password="password@123" };
+            User user = new User { UserId = "John", Password = "password@123" };
             MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
 
             // The endpoint or route of the controller action.

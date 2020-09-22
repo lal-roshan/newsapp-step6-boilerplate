@@ -53,9 +53,9 @@ namespace ReminderService.Services
         /// <returns>Returns true if deletion was successful</returns>
         public async Task<bool> DeleteReminder(string userId, int newsId)
         {
-            if (await reminderRepository.DeleteReminder(userId, newsId))
+            if (await reminderRepository.IsReminderExists(userId, newsId))
             {
-                return true;
+                return await reminderRepository.DeleteReminder(userId, newsId);
             }
             else
             {

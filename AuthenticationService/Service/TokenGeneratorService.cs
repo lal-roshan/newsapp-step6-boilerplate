@@ -1,17 +1,22 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AuthenticationService.Service
 {
+    /// <summary>
+    /// Class for generating JWT token
+    /// </summary>
     public class TokenGeneratorService : ITokenGeneratorService
     {
+        /// <summary>
+        /// Method for generating token
+        /// </summary>
+        /// <param name="userId">The user for whom the token is to be generated</param>
+        /// <returns>The generated token string</returns>
         public string GenerateToken(string userId)
         {
             var claims = new[]

@@ -1,14 +1,14 @@
-﻿using System;
-using Xunit;
-using Moq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using UserService.Models;
-using UserService.Services;
+using Moq;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using UserService.Controllers;
 using UserService.Exceptions;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
+using UserService.Models;
+using UserService.Services;
+using Xunit;
 
 namespace Test.ControllerTests.UnitTest
 {
@@ -64,7 +64,7 @@ namespace Test.ControllerTests.UnitTest
             }, "mock"));
             UserProfile _user = new UserProfile { UserId = "Jack", FirstName = "Jackson", LastName = "James", Contact = "9812345670", Email = "jack@ymail.com", CreatedAt = DateTime.Now };
             var mockService = new Mock<IUserService>();
-            mockService.Setup(svc => svc.UpdateUser(userId,_user)).Returns(Task.FromResult(true));
+            mockService.Setup(svc => svc.UpdateUser(userId, _user)).Returns(Task.FromResult(true));
             var controller = new UserController(mockService.Object);
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = user } };
 
@@ -92,7 +92,7 @@ namespace Test.ControllerTests.UnitTest
             var actionResult = Assert.IsType<ConflictObjectResult>(actual);
             Assert.Equal($"{_user.UserId} is already in use", actionResult.Value);
         }
-       
+
         [Fact]
         public async Task GetShouldReturnNotFound()
         {
@@ -111,10 +111,10 @@ namespace Test.ControllerTests.UnitTest
             Assert.Equal($"This user id doesn't exist", actionResult.Value);
         }
 
-        
-       [Fact]
-       public async Task PutShouldReturnNotFound()
-       {
+
+        [Fact]
+        public async Task PutShouldReturnNotFound()
+        {
             string userId = "Kevin";
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {

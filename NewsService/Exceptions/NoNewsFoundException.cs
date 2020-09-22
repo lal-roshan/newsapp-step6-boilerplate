@@ -2,7 +2,7 @@
 
 namespace NewsService.Exceptions
 {
-    public class NoNewsFoundException:ApplicationException
+    public class NoNewsFoundException : ApplicationException
     {
         public NoNewsFoundException() { }
         public NoNewsFoundException(string message) : base(message) { }

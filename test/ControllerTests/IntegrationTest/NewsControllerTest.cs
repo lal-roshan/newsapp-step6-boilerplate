@@ -14,7 +14,7 @@ namespace Test.ControllerTests.IntegrationTest
 {
     [Collection("Auth API")]
     [TestCaseOrderer("Test.PriorityOrderer", "test")]
-    public class NewsControllerTest :IClassFixture<NewsWebApplicationFactory<Startup>>
+    public class NewsControllerTest : IClassFixture<NewsWebApplicationFactory<Startup>>
     {
         private readonly HttpClient _client, _authclient;
         public NewsControllerTest(NewsWebApplicationFactory<Startup> factory, AuthWebApplicationFactory<AuthenticationService.Startup> authFactory)
@@ -62,9 +62,9 @@ namespace Test.ControllerTests.IntegrationTest
 
             // Deserialize and examine results.
             var stringResponse = await httpResponse.Content.ReadAsStringAsync();
-            var lstnews= JsonConvert.DeserializeObject<List<News>>(stringResponse);
+            var lstnews = JsonConvert.DeserializeObject<List<News>>(stringResponse);
             Assert.NotNull(lstnews);
-            Assert.Equal(2,lstnews.Count);
+            Assert.Equal(2, lstnews.Count);
         }
 
         [Fact, TestPriority(3)]
@@ -88,7 +88,7 @@ namespace Test.ControllerTests.IntegrationTest
             string userId = "Jack";
             News news = new News { Title = "IT industry in 2020", Content = "It is expected to have positive growth in 2020.", PublishedAt = DateTime.Now, UrlToImage = null, Url = null };
             MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-            
+
             // The endpoint or route of the controller action.
             var httpResponse = await _client.PostAsync($"/api/news", news, formatter);
 

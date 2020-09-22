@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace AuthenticationService.Service
+﻿namespace AuthenticationService.Service
 {
     public interface ITokenGeneratorService
     {

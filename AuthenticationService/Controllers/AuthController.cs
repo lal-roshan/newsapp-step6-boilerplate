@@ -1,55 +1,57 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using AuthenticationService.Exceptions;
+﻿using AuthenticationService.Exceptions;
 using AuthenticationService.Models;
 using AuthenticationService.Service;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
+using System;
 namespace AuthenticationService.Controllers
 {
-    /* Annotate the class with [ApiController] annotation and define the controller level 
-     * route as per REST Api standard.
-     */
+    /// <summary>
+    /// Api controller class for authentication
+    /// </summary>
     [Route("/api/[controller]")]
     [ApiController]
     public class AuthController : Controller
     {
-        /*
-         AuthService should  be injected through constructor injection. Please note that we should not create service
-         object using the new keyword
-        */
+        /// <summary>
+        /// readonly property for authorization service class
+        /// </summary>
         readonly IAuthService authService;
 
+        /// <summary>
+        /// readonly property for token generation service class
+        /// </summary>
         readonly ITokenGeneratorService tokenGeneratorService;
 
-        public AuthController(IAuthService authService, ITokenGeneratorService tokenGeneratorService)
+        /// <summary>
+        /// Parametrised constructor for injecting the authorization service property
+        /// and initialising token generation property
+        /// </summary>
+        /// <param name="authService"></param>
+        public AuthController(IAuthService authService)
         {
             this.authService = authService;
-            this.tokenGeneratorService = tokenGeneratorService;
+            tokenGeneratorService = new TokenGeneratorService();
         }
 
-        /*
-       * Define a handler method which will create a specific user by reading the
-       * Serialized object from request body and save the user details in the
-       * database. This handler method should return any one of the status messages
-       * basis on different situations:
-       * 1. 201(CREATED) - If the user created successfully. 
-       * 2. 409(CONFLICT) - If the userId conflicts with any existing user
-       * 
-       * This handler method should map to the URL "/api/auth/register" using HTTP POST method
-       */
+        /// <summary>
+        /// Http post method for registering new users
+        /// </summary>
+        /// <param name="user">The user data to be registered</param>
+        /// <response code="201">If user gets registered successfully</response>
+        /// <response code="409">If user already exists</response>
+        /// <response code="500">If some error occurs</response>
+        /// <returns></returns>
         [HttpPost("register")]
         [ActionName("Post")]
-        public async Task<IActionResult> Register(User user)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult Register(User user)
         {
             try
             {
-                bool registered = await authService.RegisterUser(user);
+                bool registered = authService.RegisterUser(user);
                 return Created("api/auth/register", registered);
             }
             catch (UserAlreadyExistsException ex)
@@ -62,27 +64,24 @@ namespace AuthenticationService.Controllers
             }
         }
 
-        /* Define a handler method which will authenticate a user by reading the Serialized user
-        * object from request body containing the username and password. The username and password 
-        * should be validated before proceeding ahead with JWT token generation. The user credentials 
-        * will be validated against the database entries. 
-        * 
-        * The error should be return if validation is not successful. If credentials are validated successfully, 
-        * then JWT token will be generated. The token should be returned back to the caller along with the API 
-        * response. This handler method should return any one of the status messages basis on different
-        * situations:
-        * 1. 200(OK) - If login is successful
-        * 2. 401(UNAUTHORIZED) - If login is not successful
-        * 
-        * This handler method should map to the URL "/api/auth/login" using HTTP POST method
-       */
+        /// <summary>
+        /// Http post method for user log in
+        /// </summary>
+        /// <param name="user">The credentials of user for login</param>
+        /// <response code="200">If login is successfull</response>
+        /// <response code="401">If login fails</response>
+        /// <response code="500">If some error occurs</response>
+        /// <returns></returns>
         [HttpPost("login")]
         [ActionName("Post")]
-        public async Task<IActionResult> Login(User user)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult Login(User user)
         {
             try
             {
-                if (await authService.LoginUser(user))
+                if (authService.LoginUser(user))
                 {
                     return Ok(tokenGeneratorService.GenerateToken(user.UserId));
                 }
@@ -91,7 +90,7 @@ namespace AuthenticationService.Controllers
                     return Unauthorized("Invalid user id or password");
                 }
             }
-            catch (UserNotFoundException ex)
+            catch (UnauthorizedAccessException ex)
             {
                 return Unauthorized(ex.Message);
             }

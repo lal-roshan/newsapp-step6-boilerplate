@@ -13,9 +13,9 @@ namespace Test.ControllerTests.IntegrationTest
 {
     [Collection("Auth API")]
     [TestCaseOrderer("Test.PriorityOrderer", "test")]
-    public class UserControllerTest:IClassFixture<UserWebApplicationFactory<Startup>>
+    public class UserControllerTest : IClassFixture<UserWebApplicationFactory<Startup>>
     {
-        private readonly HttpClient _client,_authclient;
+        private readonly HttpClient _client, _authclient;
         public UserControllerTest(UserWebApplicationFactory<Startup> factory, AuthWebApplicationFactory<AuthenticationService.Startup> authFactory)
         {
             //calling Auth API to get JWT
@@ -95,7 +95,7 @@ namespace Test.ControllerTests.IntegrationTest
             Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
             Assert.True(Convert.ToBoolean(stringResponse));
         }
-        
+
         [Fact, TestPriority(4)]
         public async Task PostShouldReturnUnauthorized()
         {

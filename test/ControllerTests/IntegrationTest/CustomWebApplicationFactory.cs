@@ -1,19 +1,19 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AuthenticationService.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using NewsService.Models;
+using ReminderService.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Xunit;
 using UserService.Models;
-using ReminderService.Models;
-using AuthenticationService.Models;
-using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace Test.ControllerTests.IntegrationTest
 {
@@ -162,7 +162,7 @@ namespace Test.ControllerTests.IntegrationTest
                                    }
                                }
                            }
-                        }); 
+                        });
                     }
                     catch (Exception ex)
                     {

@@ -1,15 +1,15 @@
-﻿using System;
-using Xunit;
-using Moq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ReminderService.Services;
-using ReminderService.Models;
+using Moq;
+using ReminderService.Controllers;
 using ReminderService.Exceptions;
+using ReminderService.Models;
+using ReminderService.Services;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using ReminderService.Controllers;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Test.ControllerTests.UnitTest
 {
@@ -74,7 +74,7 @@ namespace Test.ControllerTests.UnitTest
                 }
             };
             var mockService = new Mock<IReminderService>();
-            mockService.Setup(svc => svc.CreateReminder(reminder.UserId,reminder.Email,reminder.NewsReminders[0])).Returns(Task.FromResult(true));
+            mockService.Setup(svc => svc.CreateReminder(reminder.UserId, reminder.Email, reminder.NewsReminders[0])).Returns(Task.FromResult(true));
             var controller = new ReminderController(mockService.Object);
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = user } };
 
@@ -82,7 +82,7 @@ namespace Test.ControllerTests.UnitTest
             var actionresult = Assert.IsType<CreatedResult>(actual);
             Assert.True(Convert.ToBoolean(actionresult.Value));
         }
-        
+
         [Fact]
         public async Task PostShouldReturnConflict()
         {
@@ -110,7 +110,7 @@ namespace Test.ControllerTests.UnitTest
             var actionResult = Assert.IsType<ConflictObjectResult>(actual);
             Assert.Equal($"This News already have a reminder", actionResult.Value);
         }
-        
+
         [Fact]
         public async Task DeleteShouldReturnOk()
         {
@@ -121,7 +121,7 @@ namespace Test.ControllerTests.UnitTest
             }, "mock"));
             int newsId = 101;
             var mockService = new Mock<IReminderService>();
-            mockService.Setup(svc => svc.DeleteReminder(userId,newsId)).Returns(Task.FromResult(true));
+            mockService.Setup(svc => svc.DeleteReminder(userId, newsId)).Returns(Task.FromResult(true));
             var controller = new ReminderController(mockService.Object);
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = user } };
 
@@ -140,8 +140,8 @@ namespace Test.ControllerTests.UnitTest
             }, "mock"));
             int newsId = 101;
             var mockService = new Mock<IReminderService>();
-            mockService.Setup(svc => svc.DeleteReminder(userId, newsId)).Throws(new NoReminderFoundException("No reminder found for this news")); 
-           
+            mockService.Setup(svc => svc.DeleteReminder(userId, newsId)).Throws(new NoReminderFoundException("No reminder found for this news"));
+
             var controller = new ReminderController(mockService.Object);
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = user } };
 
@@ -160,7 +160,7 @@ namespace Test.ControllerTests.UnitTest
             }, "mock"));
             ReminderSchedule reminder = new ReminderSchedule { NewsId = 101, Schedule = DateTime.Now.AddDays(2) };
             var mockService = new Mock<IReminderService>();
-            mockService.Setup(svc => svc.UpdateReminder(userId,reminder)).Returns(Task.FromResult(true));
+            mockService.Setup(svc => svc.UpdateReminder(userId, reminder)).Returns(Task.FromResult(true));
             var controller = new ReminderController(mockService.Object);
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = user } };
 
