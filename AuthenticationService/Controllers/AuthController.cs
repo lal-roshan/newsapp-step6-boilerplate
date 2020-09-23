@@ -3,7 +3,13 @@ using AuthenticationService.Models;
 using AuthenticationService.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
 namespace AuthenticationService.Controllers
 {
     /// <summary>
@@ -19,19 +25,43 @@ namespace AuthenticationService.Controllers
         readonly IAuthService authService;
 
         /// <summary>
-        /// readonly property for token generation service class
-        /// </summary>
-        readonly ITokenGeneratorService tokenGeneratorService;
-
-        /// <summary>
         /// Parametrised constructor for injecting the authorization service property
-        /// and initialising token generation property
         /// </summary>
         /// <param name="authService"></param>
         public AuthController(IAuthService authService)
         {
             this.authService = authService;
-            tokenGeneratorService = new TokenGeneratorService();
+        }
+
+        /// <summary>
+        /// Method for generating token
+        /// </summary>
+        /// <param name="userId">The user for whom the token is to be generated</param>
+        /// <returns>The generated token string</returns>
+        private string GenerateToken(string userId)
+        {
+            var claims = new[]
+            {
+                new Claim("userId", userId)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("$eCuRiTeE_KeY_4_AuTh"));
+            var signature = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: "AuthAPI",
+                audience: "AuthClient",
+                expires: DateTime.UtcNow.AddMinutes(10),
+                claims: claims,
+                signingCredentials: signature
+            );
+
+            var tokenResponse = new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token)
+            };
+
+            return JsonConvert.SerializeObject(tokenResponse);
         }
 
         /// <summary>
@@ -83,7 +113,7 @@ namespace AuthenticationService.Controllers
             {
                 if (authService.LoginUser(user))
                 {
-                    return Ok(tokenGeneratorService.GenerateToken(user.UserId));
+                    return Ok(GenerateToken(user.UserId));
                 }
                 else
                 {
@@ -99,6 +129,5 @@ namespace AuthenticationService.Controllers
                 return StatusCode(500, "Some error occurred, please try again later!!");
             }
         }
-
     }
 }
