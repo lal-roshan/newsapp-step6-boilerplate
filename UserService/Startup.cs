@@ -1,12 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Text;
 using UserService.Models;
 using UserService.Repository;
 using UserService.Services;
@@ -32,30 +28,9 @@ namespace UserService
 
             ///reading token payload related data from appsettings
             var tokenData = Configuration.GetSection("TokenData");
+            services.AddJWTAuthentication(tokenData);
 
-            ///add options for authentication
-            services.AddAuthentication(
-                options =>
-                {
-                    ///Provide default and challenge schema
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }
-                ).AddJwtBearer(
-                    ///Mention parameters that are to be validated
-                    o => o.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = tokenData["Issuer"],
-                        ValidateAudience = true,
-                        ValidAudience = tokenData["Audience"],
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(tokenData["SecretKey"])),
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero
-                    }
-                );
-            ///Register all dependencies here
+            services.AddJWTSwagger();
         }
 
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,6 +46,14 @@ namespace UserService
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            // Swagger Configuration in API  
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "User Api");
+
+            });
 
             app.UseEndpoints(endpoints =>
             {

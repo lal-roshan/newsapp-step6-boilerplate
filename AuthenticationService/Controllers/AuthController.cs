@@ -67,6 +67,18 @@ namespace AuthenticationService.Controllers
         /// <summary>
         /// Http post method for registering new users
         /// </summary>
+        /// <remarks>
+        /// Http post method for registering new users
+        /// 
+        /// Sample Request:
+        /// 
+        /// POST/ Register
+        /// {
+        ///     "UserId" : "string",
+        ///     "Password" : "string"
+        /// }
+        /// 
+        /// </remarks>
         /// <param name="user">The user data to be registered</param>
         /// <response code="201">If user gets registered successfully</response>
         /// <response code="409">If user already exists</response>
@@ -97,6 +109,18 @@ namespace AuthenticationService.Controllers
         /// <summary>
         /// Http post method for user log in
         /// </summary>
+        /// <remarks>
+        /// Http post method for user log in
+        /// 
+        /// Sample Request:
+        /// 
+        /// POST/ Login
+        /// {
+        ///     "UserId" : "string",
+        ///     "Password" : "string"
+        /// }
+        /// 
+        /// </remarks>
         /// <param name="user">The credentials of user for login</param>
         /// <response code="200">If login is successfull</response>
         /// <response code="401">If login fails</response>

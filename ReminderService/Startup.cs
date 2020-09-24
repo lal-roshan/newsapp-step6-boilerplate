@@ -1,15 +1,11 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using ReminderService.Models;
 using ReminderService.Repository;
 using ReminderService.Services;
-using System;
-using System.Text;
 
 namespace ReminderService
 {
@@ -22,7 +18,7 @@ namespace ReminderService
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(s => new ReminderContext(Configuration));
@@ -32,31 +28,9 @@ namespace ReminderService
 
             ///reading token payload related data from appsettings
             var tokenData = Configuration.GetSection("TokenData");
+            services.AddJWTAuthentication(tokenData);
 
-            ///add options for authentication
-            services.AddAuthentication(
-                options =>
-                {
-                    ///Provide default and challenge schema
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }
-                ).AddJwtBearer(
-                    ///Mention parameters that are to be validated
-                    o => o.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = tokenData["Issuer"],
-                        ValidateAudience = true,
-                        ValidAudience = tokenData["Audience"],
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(tokenData["SecretKey"])),
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero
-                    }
-                );
-            //provide options for Database Context to Register Dependencies
-            //Register all dependencies here
+            services.AddJWTSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,6 +46,14 @@ namespace ReminderService
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            // Swagger Configuration in API  
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reminder Api");
+
+            });
 
             app.UseEndpoints(endpoints =>
             {
