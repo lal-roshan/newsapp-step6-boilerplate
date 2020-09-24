@@ -68,8 +68,6 @@ namespace AuthenticationService.Controllers
         /// Http post method for registering new users
         /// </summary>
         /// <remarks>
-        /// Http post method for registering new users
-        /// 
         /// Sample Request:
         /// 
         /// POST/ Register
@@ -110,8 +108,6 @@ namespace AuthenticationService.Controllers
         /// Http post method for user log in
         /// </summary>
         /// <remarks>
-        /// Http post method for user log in
-        /// 
         /// Sample Request:
         /// 
         /// POST/ Login

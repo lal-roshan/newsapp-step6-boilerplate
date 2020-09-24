@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -50,17 +52,17 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>Service collection configured with Swagger</returns>
         public static IServiceCollection AddJWTSwagger(this IServiceCollection services)
         {
-            /// Enable Swagger   
+            // Enable Swagger   
             services.AddSwaggerGen(swagger =>
             {
-                ///This is to generate the Default UI of Swagger Documentation  
+                //This is to generate the Default UI of Swagger Documentation  
                 swagger.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
                     Title = "Reminder API with JWT",
                     Description = "Reminder API"
                 });
-                /// To Enable authorization using Swagger (JWT)  
+                // To Enable authorization using Swagger (JWT)  
                 swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
                     Name = "Authorization",
@@ -86,6 +88,10 @@ namespace Microsoft.Extensions.DependencyInjection
                             new string[] {}
                     }
                 });
+                //For generating comments for action methods in swagger ui from xml comments file
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                swagger.IncludeXmlComments(xmlPath);
             });
             return services;
         }
