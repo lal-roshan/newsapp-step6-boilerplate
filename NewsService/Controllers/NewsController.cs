@@ -66,7 +66,7 @@ namespace NewsService.Controllers
         }
 
         /// <summary>
-        /// Http post for adding new reminder
+        /// Http post for adding new news
         /// </summary>
         /// <param name="news">The details of the news to be added</param>
         /// <response code="201">If reminder was added successfully</response>
